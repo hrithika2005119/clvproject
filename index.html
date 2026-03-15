@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CLV Predictor </title>
+<style>
+  body {
+    font-family: Georgia, 'Times New Roman', Times, serif,;
+    background: #9dc6ef;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .container {
+    background: rgb(239, 203, 203);
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    max-width: 350px;
+    width: 100%;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 1rem;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  .result {
+    margin-top: 20px;
+    font-weight: 700;
+    text-align: center;
+    font-size: 1.25rem;
+    color: #2a7a2a;
+  }
+
+  .error {
+    margin-top: 20px;
+    color: #d9534f;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>CLV Prediction </h2>
+
+  <label for="recency">Recency (days since last purchase):</label>
+  <input type="number" id="recency" min="0" />
+
+  <label for="frequency">Frequency (number of purchases):</label>
+  <input type="number" id="frequency" min="0" />
+
+  <label for="monetary">Monetary (total amount spent):</label>
+  <input type="number" id="monetary" min="0" step="0.01" />
+
+  <button id="predictBtn">Predict CLV</button>
+
+  <div id="result" class="result"></div>
+  <div id="error" class="error"></div>
+</div>
+
+<script>
+  const predictBtn = document.getElementById('predictBtn');
+  const resultDiv = document.getElementById('result');
+  const errorDiv = document.getElementById('error');
+
+  const USD_TO_INR = 85.6;  // Fixed conversion rate (1 USD ≈ 85.6 INR)
+
+  const inrFormatter = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2
+  });
+
+  predictBtn.addEventListener('click', () => {
+    errorDiv.textContent = '';
+    resultDiv.textContent = '';
+
+    const recency = parseFloat(document.getElementById('recency').value);
+    const frequency = parseFloat(document.getElementById('frequency').value);
+    const monetary = parseFloat(document.getElementById('monetary').value);
+
+    if (isNaN(recency) || isNaN(frequency) || isNaN(monetary)) {
+      errorDiv.textContent = 'Please enter valid numbers in all fields.';
+      return;
+    }
+
+    if (recency < 0 || frequency < 0 || monetary < 0) {
+      errorDiv.textContent = 'Values cannot be negative.';
+      return;
+    }
+
+    // Dummy linear regression formula:
+    const intercept = 10;
+    const coefRecency = 0.5;
+    const coefFrequency = 2.0;
+    const coefMonetary = 1.5;
+
+    const predictedCLV_USD = intercept + (coefRecency * recency) + (coefFrequency * frequency) + (coefMonetary * monetary);
+    const predictedCLV_INR = predictedCLV_USD * USD_TO_INR;
+
+    resultDiv.textContent = `Predicted Customer Lifetime Value: ${inrFormatter.format(predictedCLV_INR)}`;
+  });
+</script>
+</body>
+</html>
